@@ -1,35 +1,5 @@
 package events
 
-type DNS struct {
-	Type   string `json:"type"`
-	ID     int    `json:"id,omitempty"`
-	Rcode  string `json:"rcode"`
-	Rrname string `json:"rrname"`
-	Rrtype string `json:"rrtype"`
-	TTL    int    `json:"ttl,omitempty"`
-	Rdata  string `json:"rdata,omitempty"`
-	TxID   int    `json:"tx_id,omitempty"`
-}
-
-func (d DNS) Empty() bool {
-	return d.Rdata == "" && d.Rrname == "" && d.Rrtype == "" && d.TTL == 0
-}
-
-type HTTP struct {
-	Hostname        string `json:"hostname"`
-	URL             string `json:"url"`
-	HTTPUserAgent   string `json:"http_user_agent,omitempty"`
-	HTTPContentType string `json:"http_content_type,omitempty"`
-	HTTPMethod      string `json:"http_method,omitempty"`
-	Protocol        string `json:"protocol,omitempty"`
-	Status          int    `json:"status"`
-	Length          int    `json:"length"`
-}
-
-func (h HTTP) Empty() bool {
-	return h.Hostname == "" && h.URL == "" && h.HTTPUserAgent == "" && h.HTTPContentType == "" && h.HTTPMethod == "" && h.Protocol == "" && h.Status == 0 && h.Length == 0
-}
-
 type TLS struct {
 	Subject     string `json:"subject"`
 	Issuerdn    string `json:"issuerdn,omitempty"`
