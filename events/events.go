@@ -78,7 +78,7 @@ type EveEvent struct {
 	EventType         string `json:"event_type"`
 	FlowID            int64  `json:"flow_id,omitempty"`
 	InIface           string `json:"in_iface,omitempty"`
-	Vlan              int    `json:"vlan,omitempty"`
+	VLAN              VLAN   `json:"vlan,omitempty"`
 	SrcIP             string `json:"src_ip,omitempty"`
 	SrcPort           int    `json:"src_port,omitempty"`
 	DestIP            string `json:"dest_ip,omitempty"`
