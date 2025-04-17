@@ -19,7 +19,7 @@ func main() {
 	loader := parsuri.NewLoader()
 
 	// Load the eve.json file asynchronously
-	if err := loader.LoadFile("eve.json"); err != nil {
+	if err := loader.LoadOneFile("eve.json"); err != nil {
 		log.Fatal(err)
 	}
 

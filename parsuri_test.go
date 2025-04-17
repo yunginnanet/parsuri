@@ -11,7 +11,7 @@ func ExampleNewLoader() {
 	loader := NewLoader()
 
 	// Load the eve.json file asynchronously
-	if err := loader.LoadFile("pathto/eve.json"); err != nil {
+	if err := loader.LoadOneFile("pathto/eve.json"); err != nil {
 		log.Fatal(err)
 	}
 
@@ -39,7 +39,7 @@ func TestLoadEveJSONFile(t *testing.T) {
 	loader := NewLoader()
 
 	// Load the eve.json file
-	if err := loader.LoadFile("testdata/eve.json"); err != nil {
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -83,7 +83,7 @@ func TestLoadBrokenEveJSONFile(t *testing.T) {
 
 	loader := NewLoader()
 
-	if err := loader.LoadFile("testdata/eve_broken.json"); err != nil {
+	if err := loader.LoadOneFile("testdata/eve_broken.json"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -111,7 +111,7 @@ func TestLoadBrokenEveJSONFile(t *testing.T) {
 func TestMissingJSONFile(t *testing.T) {
 	loader := NewLoader()
 
-	if err := loader.LoadFile("nonexistant"); err == nil {
+	if err := loader.LoadOneFile("nonexistant"); err == nil {
 		t.Fatal("expected error, got nil")
 	}
 }
@@ -119,7 +119,7 @@ func TestMissingJSONFile(t *testing.T) {
 func TestMarshalWithTimestamp(t *testing.T) {
 	loader := NewLoader()
 
-	if err := loader.LoadFile("testdata/eve.json"); err != nil {
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
 		t.Fatal(err)
 	}
 
