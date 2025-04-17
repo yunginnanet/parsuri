@@ -13,4 +13,4 @@ This is a rewrite of [surevego](https://github.com/rhaist/surevego).
 
 - BSD-3 Copyright (c) 2017 **Robert Haist**
 
-- BSD-3 Copyright (c) 2025 **kayos@tcp.direct**
+- BSD-3 Copyright (c) 2025 [yunginnanet](https://github.com/yunginnanet)
