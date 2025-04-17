@@ -7,10 +7,7 @@ import (
 	"io"
 )
 
-func (l *Loader) parseLine(scanner *bufio.Scanner) (shouldContinue bool) {
-	if e := scanner.Err(); e != nil {
-		l.addErr(e)
-	}
+func (l *Loader) parseLine(dat []byte) (shouldContinue bool) {
 
 	if !l.isRunning() {
 		return false
@@ -18,7 +15,7 @@ func (l *Loader) parseLine(scanner *bufio.Scanner) (shouldContinue bool) {
 
 	ev := events.EveEvent{}
 
-	err := sonic.Unmarshal(scanner.Bytes(), &ev)
+	err := sonic.Unmarshal(dat, &ev)
 	if err == nil {
 		l.queue.Push(ev)
 
@@ -30,12 +27,15 @@ func (l *Loader) parseLine(scanner *bufio.Scanner) (shouldContinue bool) {
 	return true
 }
 
-// Parse parses the input stream synchronously.
-func (l *Loader) Parse(r io.Reader) {
+// Scan parses the input stream synchronously.
+func (l *Loader) Scan(r io.Reader) {
 	scanner := bufio.NewScanner(r)
 
 	for scanner.Scan() {
-		if !l.parseLine(scanner) {
+		if e := scanner.Err(); e != nil {
+			l.addErr(e)
+		}
+		if !l.parseLine(scanner.Bytes()) {
 			break
 		}
 	}
@@ -43,14 +43,14 @@ func (l *Loader) Parse(r io.Reader) {
 
 // ParseAsync parses the input stream asynchronously.
 func (l *Loader) ParseAsync(r io.Reader) {
-	go l.Parse(r)
+	go l.Scan(r)
 }
 
 // ParseAndCloseAsync parses the input stream and closes it asynchronously.
 // It also calls [Loader.Close] when finished, causing [Loader.More] to return false.
 func (l *Loader) ParseAndCloseAsync(r io.ReadCloser) {
 	go func() {
-		l.Parse(r)
+		l.Scan(r)
 
 		if err := r.Close(); err != nil {
 			l.addErr(err)
