@@ -32,7 +32,7 @@ func NewLoader() *Loader {
 	running := &atomic.Int32{}
 	running.Store(int32(statusRunning))
 	return &Loader{
-		queue:   buffer.NewQueue[events.EveEvent](100 << 20),
+		queue:   buffer.NewQueue[events.EveEvent](100000),
 		errs:    make([]error, 0),
 		running: running,
 	}
@@ -61,7 +61,7 @@ func (l *Loader) Event() events.EveEvent {
 	}
 
 	for l.More() {
-		time.Sleep(5 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 		item, ok = l.queue.Pop()
 		if ok {
 			return item
