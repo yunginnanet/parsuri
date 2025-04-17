@@ -2,13 +2,13 @@ package events
 
 type DNS struct {
 	Type   string `json:"type"`
-	ID     int    `json:"id"`
+	ID     int    `json:"id,omitempty"`
 	Rcode  string `json:"rcode"`
 	Rrname string `json:"rrname"`
 	Rrtype string `json:"rrtype"`
-	TTL    int    `json:"ttl"`
-	Rdata  string `json:"rdata"`
-	TxID   int    `json:"tx_id"`
+	TTL    int    `json:"ttl,omitempty"`
+	Rdata  string `json:"rdata,omitempty"`
+	TxID   int    `json:"tx_id,omitempty"`
 }
 
 func (d DNS) Empty() bool {
@@ -18,10 +18,10 @@ func (d DNS) Empty() bool {
 type HTTP struct {
 	Hostname        string `json:"hostname"`
 	URL             string `json:"url"`
-	HTTPUserAgent   string `json:"http_user_agent"`
-	HTTPContentType string `json:"http_content_type"`
-	HTTPMethod      string `json:"http_method"`
-	Protocol        string `json:"protocol"`
+	HTTPUserAgent   string `json:"http_user_agent,omitempty"`
+	HTTPContentType string `json:"http_content_type,omitempty"`
+	HTTPMethod      string `json:"http_method,omitempty"`
+	Protocol        string `json:"protocol,omitempty"`
 	Status          int    `json:"status"`
 	Length          int    `json:"length"`
 }
@@ -32,25 +32,24 @@ func (h HTTP) Empty() bool {
 
 type TLS struct {
 	Subject     string `json:"subject"`
-	Issuerdn    string `json:"issuerdn"`
+	Issuerdn    string `json:"issuerdn,omitempty"`
 	Fingerprint string `json:"fingerprint"`
-	Sni         string `json:"sni"`
-	Version     string `json:"version"`
+	Sni         string `json:"sni,omitempty"`
+	Version     string `json:"version,omitempty"`
 }
 
 func (t TLS) Empty() bool {
 	return t.Subject == "" && t.Issuerdn == "" && t.Fingerprint == "" && t.Sni == "" && t.Version == ""
 }
 
+type SSHDetails struct {
+	ProtoVersion    string `json:"proto_version"`
+	SoftwareVersion string `json:"software_version"`
+}
+
 type SSH struct {
-	Client struct {
-		ProtoVersion    string `json:"proto_version"`
-		SoftwareVersion string `json:"software_version"`
-	} `json:"client"`
-	Server struct {
-		ProtoVersion    string `json:"proto_version"`
-		SoftwareVersion string `json:"software_version"`
-	} `json:"server"`
+	Client SSHDetails `json:"client"`
+	Server SSHDetails `json:"server"`
 }
 
 func (s SSH) Empty() bool {

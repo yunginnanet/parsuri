@@ -44,6 +44,10 @@ func (f Flow) Empty() bool {
 	return f.PktsToserver == 0 && f.PktsToclient == 0 && f.BytesToserver == 0 && f.BytesToclient == 0 && f.Start == nil && f.End == nil && f.Age == 0 && f.State == "" && f.Reason == ""
 }
 
+type PacketInfo struct {
+	Linktype int `json:"linktype"`
+}
+
 // EveEvent is the huge struct which can contain a parsed suricata eve.json
 // log event.
 type EveEvent struct {
@@ -61,9 +65,7 @@ type EveEvent struct {
 	TxID      int    `json:"tx_id,omitempty"`
 	TCP       *TCP   `json:"tcp,omitempty"`
 
-	PacketInfo struct {
-		Linktype int `json:"linktype"`
-	} `json:"packet_info,omitempty"`
+	PacketDetails *PacketInfo `json:"packet_info,omitempty"`
 
 	// Alert Events have some additional high level attributes to the json model
 	Alert            *Alert `json:"alert,omitempty"`
