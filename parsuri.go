@@ -1,4 +1,4 @@
-package surevego
+package parsuri
 
 import (
 	"bufio"
