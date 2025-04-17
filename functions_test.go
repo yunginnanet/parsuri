@@ -2,26 +2,32 @@ package surevego
 
 import (
 	"encoding/json"
+	"github.com/yunginnanet/parsuri/events"
 	"log"
-	"sync"
 	"testing"
 )
 
-func ExampleLoadEveJSONFile() {
-	ee, ec := LoadEveJSONFile("pathto/eve.json")
+func ExampleNewLoader() {
+	loader := NewLoader()
 
-	// Fork handling of parsing errors to a gofunc
-	go func() {
-		for err := range ec {
-			log.Fatal("[ERR]", err)
-		}
-	}()
+	// Load the eve.json file asynchronously
+	if err := loader.LoadFile("pathto/eve.json"); err != nil {
+		log.Fatal(err)
+	}
 
 	// Range over the events and print dns answers to stdout
-	for event := range ee {
-		if event.DNS != nil && event.DNS.Type == "answer" {
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			log.Fatal(err)
+		}
+		event := loader.Event()
+		if !event.DNS.Empty() && event.DNS.Type == "answer" {
 			log.Println(event.DNS)
 		}
+	}
+
+	if err := loader.Err(); err != nil {
+		log.Fatal(err)
 	}
 }
 
@@ -30,98 +36,107 @@ func TestLoadEveJSONFile(t *testing.T) {
 	var countDNS int
 	var countFlow int
 
-	ee, ec := LoadEveJSONFile("testdata/eve.json")
+	loader := NewLoader()
 
-	go func() {
-		for err := range ec {
+	// Load the eve.json file
+	if err := loader.LoadFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
 			t.Error(err)
 		}
-	}()
 
-	for event := range ee {
-		if event.DNS != nil {
+		event := loader.Event()
+
+		if event.DNS != nil && !event.DNS.Empty() {
 			countDNS++
 		}
-		if event.Flow != nil {
+		if event.Flow != nil && !event.Flow.Empty() {
 			countFlow++
 		}
 		if event.EventType == "" || event.Timestamp.IsZero() {
 			t.Error("Mandatory field missing")
 		}
+
 		countTotal++
 	}
 
-	if countDNS != 48 || countFlow != 13 || countTotal != 266 {
-		t.Error("Event count mismatch")
+	if err := loader.Err(); err != nil {
+		t.Error(err)
+	}
+
+	if countDNS != 48 {
+		t.Errorf("DNS count mismatch: %d != 48", countDNS)
+	}
+	if countFlow != 13 {
+		t.Errorf("Flow count mismatch: %d != 13", countFlow)
+	}
+	if countTotal != 266 {
+		t.Errorf("Total count mismatch: %d != 266", countTotal)
 	}
 }
 
 func TestLoadBrokenEveJSONFile(t *testing.T) {
 	var countErrors int
-	var wg sync.WaitGroup
 
-	ee, ec := LoadEveJSONFile("testdata/eve_broken.json")
+	loader := NewLoader()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for err := range ec {
+	if err := loader.LoadFile("testdata/eve_broken.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
 			t.Log(err)
 			countErrors++
 		}
-	}()
-
-	for event := range ee {
+		event := loader.Event()
 		if event.EventType == "" || event.Timestamp.IsZero() {
 			t.Error("Mandatory field missing")
 		}
 	}
 
-	wg.Wait()
+	if err := loader.Err(); err != nil {
+		t.Log(err)
+		countErrors++
+	}
+
 	if countErrors < 1 {
-		t.Error("Error count mismatch")
+		t.Errorf("Expected at least one error, got %d", countErrors)
 	}
 }
 
 func TestMissingJSONFile(t *testing.T) {
-	var countErrors int
-	var wg sync.WaitGroup
+	loader := NewLoader()
 
-	_, ec := LoadEveJSONFile("nonexistant")
-
-	wg.Add(1)
-	go func(myWg *sync.WaitGroup, myEc <-chan error) {
-		defer myWg.Done()
-		for err := range myEc {
-			t.Log(err)
-			countErrors++
-			break
-		}
-	}(&wg, ec)
-
-	wg.Wait()
-	if countErrors < 1 {
-		t.Error("Error count mismatch")
+	if err := loader.LoadFile("nonexistant"); err == nil {
+		t.Fatal("expected error, got nil")
 	}
 }
 
 func TestMarshalWithTimestamp(t *testing.T) {
-	ee, ec := LoadEveJSONFile("testdata/eve.json")
+	loader := NewLoader()
 
-	go func() {
-		for err := range ec {
-			t.Error(err)
-		}
-	}()
+	if err := loader.LoadFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
 
-	e := <-ee
+	if err := loader.Err(); err != nil {
+		t.Error(err)
+	}
+
+	e := loader.Event()
 
 	out, err := json.Marshal(e)
 	if err != nil {
 		t.Error(err)
 	}
 
-	var inEVE EveEvent
+	println(string(out))
+
+	var inEVE events.EveEvent
 	err = json.Unmarshal(out, &inEVE)
 	if err != nil {
 		t.Error(err)
