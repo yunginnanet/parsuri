@@ -22,6 +22,11 @@ func (l *Loader) parseLine(dat []byte) (shouldContinue bool) {
 		return true
 	}
 
+	if len(string(dat)) > 0 {
+		l.addErr(fmt.Errorf("error unmarshaling eve.json line: %w\n---\n\t%s\n---", err, string(dat)))
+		return true
+	}
+
 	l.addErr(fmt.Errorf("error unmarshaling eve.json line: %w", err))
 
 	return true
