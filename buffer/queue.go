@@ -60,6 +60,7 @@ func (q *Queue[T]) PopFront() (T, bool) {
 	q.mu.RLock()
 	if q.dq.Len() == 0 {
 		var z T
+		q.mu.RUnlock()
 		return z, false
 	}
 	val := q.dq.PopFront()
