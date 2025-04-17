@@ -1,11 +1,11 @@
 package events
 
 type Alert struct {
-	Action      string `json:"action"`
-	Gid         int    `json:"gid"`
-	SignatureID int    `json:"signature_id"`
-	Rev         int    `json:"rev"`
-	Signature   string `json:"signature"`
+	Action      string `json:"action,omitempty"`
+	Gid         int    `json:"gid,omitempty"`
+	SignatureID int    `json:"signature_id,omitempty"`
+	Rev         int    `json:"rev,omitempty"`
+	Signature   string `json:"signature,omitempty"`
 	Category    string `json:"category"`
 	Severity    int    `json:"severity"`
 }
@@ -17,11 +17,11 @@ func (a Alert) Empty() bool {
 type FileInfo struct {
 	Filename string `json:"filename"`
 	Magic    string `json:"magic"`
-	State    string `json:"state"`
-	Md5      string `json:"md5"`
-	Stored   bool   `json:"stored"`
+	State    string `json:"state,omitempty"`
+	Md5      string `json:"md5,omitempty"`
+	Stored   bool   `json:"stored,omitempty"`
 	Size     int    `json:"size"`
-	TxID     int    `json:"tx_id"`
+	TxID     int    `json:"tx_id,omitempty"`
 }
 
 func (f FileInfo) Empty() bool {
@@ -29,15 +29,15 @@ func (f FileInfo) Empty() bool {
 }
 
 type Flow struct {
-	PktsToserver  int    `json:"pkts_toserver"`
-	PktsToclient  int    `json:"pkts_toclient"`
-	BytesToserver int    `json:"bytes_toserver"`
-	BytesToclient int    `json:"bytes_toclient"`
+	PktsToserver  int    `json:"pkts_toserver,omitempty"`
+	PktsToclient  int    `json:"pkts_toclient,omitempty"`
+	BytesToserver int    `json:"bytes_toserver,omitempty"`
+	BytesToclient int    `json:"bytes_toclient,omitempty"`
 	Start         *Time  `json:"start"`
 	End           *Time  `json:"end"`
-	Age           int    `json:"age"`
+	Age           int    `json:"age,omitempty"`
 	State         string `json:"state"`
-	Reason        string `json:"reason"`
+	Reason        string `json:"reason,omitempty"`
 }
 
 func (f Flow) Empty() bool {
