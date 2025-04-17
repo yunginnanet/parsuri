@@ -81,7 +81,6 @@ func (l *Loader) Err() error {
 func (l *Loader) addErr(err error) {
 	l.mu.Lock()
 	l.errs = append(l.errs, err)
-	println("adding error", err.Error())
 	l.mu.Unlock()
 }
 

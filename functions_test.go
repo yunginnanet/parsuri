@@ -134,8 +134,6 @@ func TestMarshalWithTimestamp(t *testing.T) {
 		t.Error(err)
 	}
 
-	println(string(out))
-
 	var inEVE events.EveEvent
 	err = json.Unmarshal(out, &inEVE)
 	if err != nil {
