@@ -1,7 +1,7 @@
 # parsuri
 
 
-[![GoDoc](https://godoc.org/github.com/yunginnanet/parsuri?status.svg)](http://godoc.org/github.com/yunginnanet/parsuri)
+[![GoDoc](https://godoc.org/github.com/yunginnanet/parsuri?status.svg)](http://godoc.org/github.com/yunginnanet/parsuri) [![codecov](https://codecov.io/gh/yunginnanet/parsuri/branch/main/graph/badge.svg?token=vk5frSGqhq)](https://codecov.io/gh/yunginnanet/parsuri)
 
 [parsuri](https://github.com/yunginnanet/parsuri) is a Go library to parse suricata eve.json files with proper marshaling.
 
