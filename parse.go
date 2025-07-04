@@ -46,11 +46,6 @@ func (l *Loader) Scan(r io.Reader) {
 	}
 }
 
-// ParseAsync parses the input stream asynchronously.
-func (l *Loader) ParseAsync(r io.Reader) {
-	go l.Scan(r)
-}
-
 // ParseAndCloseAsync parses the input stream and closes it asynchronously.
 // It also calls [Loader.Close] when finished, causing [Loader.More] to return false.
 func (l *Loader) ParseAndCloseAsync(r io.ReadCloser) {
