@@ -3,7 +3,7 @@ package parsuri
 import (
 	"bufio"
 	"fmt"
-	"github.com/yunginnanet/parsuri/events"
+	"github.com/yunginnanet/parsuri/pkg/events"
 	"io"
 )
 

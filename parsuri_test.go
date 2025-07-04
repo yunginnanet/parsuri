@@ -2,7 +2,7 @@ package parsuri
 
 import (
 	"encoding/json"
-	"github.com/yunginnanet/parsuri/events"
+	"github.com/yunginnanet/parsuri/pkg/events"
 	"log"
 	"testing"
 )
@@ -20,8 +20,14 @@ func ExampleNewLoader() {
 		if err := loader.Err(); err != nil {
 			log.Fatal(err)
 		}
+
 		event := loader.Event()
-		if !event.DNS.Empty() && event.DNS.Type == "answer" {
+
+		if event.DNS == nil || event.DNS.Empty() {
+			continue
+		}
+
+		if event.DNS.Type == "answer" {
 			log.Println(event.DNS)
 		}
 	}
@@ -29,6 +35,196 @@ func ExampleNewLoader() {
 	if err := loader.Err(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func TestAlertEvent(t *testing.T) {
+	loader := NewLoader()
+
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			t.Error(err)
+		}
+
+		event := loader.Event()
+
+		if event.Type != "alert" {
+			continue
+		}
+
+		if event.Alert.Action == "allowed" {
+			return
+		}
+	}
+
+	t.Error("No allowed alert found")
+}
+
+func TestFileinfoEventTruncated(t *testing.T) {
+	loader := NewLoader()
+
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			t.Error(err)
+		}
+
+		event := loader.Event()
+
+		if event.Type != "fileinfo" {
+			continue
+		}
+
+		// spew.Dump(event)
+
+		if event.Fileinfo.State == "TRUNCATED" {
+			t.Logf("Found truncated fileinfo: %v", event.Fileinfo)
+			return
+		}
+	}
+
+	t.Error("No truncated fileinfo found")
+}
+
+func TestFileinfoEventClosed(t *testing.T) {
+	loader := NewLoader()
+
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			t.Error(err)
+		}
+
+		event := loader.Event()
+
+		if event.Type != "fileinfo" {
+			continue
+		}
+
+		// spew.Dump(event)
+
+		if event.Fileinfo.State == "CLOSED" {
+			return
+		}
+	}
+
+	t.Error("No closed fileinfo found")
+}
+
+func TestFileinfoEventStored(t *testing.T) {
+	loader := NewLoader()
+
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			t.Error(err)
+		}
+
+		event := loader.Event()
+
+		if event.Type != "fileinfo" {
+			continue
+		}
+
+		// spew.Dump(event)
+
+		if event.Fileinfo.Stored {
+			return
+		}
+	}
+
+	t.Error("No stored fileinfo found")
+}
+
+func TestFileinfoEventNotStored(t *testing.T) {
+	loader := NewLoader()
+
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			t.Error(err)
+		}
+
+		event := loader.Event()
+		if event.Type == "fileinfo" && !event.Fileinfo.Stored {
+			t.Logf("Found not stored fileinfo: %v", event.Fileinfo)
+			return
+		}
+	}
+
+	t.Error("No not stored fileinfo found")
+}
+
+func TestHTTPEventGET(t *testing.T) {
+	loader := NewLoader()
+
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			t.Error(err)
+		}
+
+		event := loader.Event()
+
+		if event.HTTP.Empty() {
+			continue
+		}
+
+		// spew.Dump(event)
+
+		if event.HTTP.Method == "GET" {
+			return
+		}
+
+	}
+
+	t.Error("No GET http event found")
+}
+
+func TestHTTPEventStatus200(t *testing.T) {
+	loader := NewLoader()
+
+	if err := loader.LoadOneFile("testdata/eve.json"); err != nil {
+		t.Fatal(err)
+	}
+
+	for loader.More() {
+		if err := loader.Err(); err != nil {
+			t.Error(err)
+		}
+
+		event := loader.Event()
+
+		if event.Type != "http" {
+			continue
+		}
+
+		t.Logf("%v", event.HTTP)
+
+		if event.HTTP.Status == 200 {
+			return
+		}
+	}
+
+	t.Error("No HTTP status 200 found")
 }
 
 func TestLoadEveJSONFile(t *testing.T) {
@@ -50,13 +246,15 @@ func TestLoadEveJSONFile(t *testing.T) {
 
 		event := loader.Event()
 
+		t.Logf("%v", event)
+
 		if event.DNS != nil && !event.DNS.Empty() {
 			countDNS++
 		}
 		if event.Flow != nil && !event.Flow.Empty() {
 			countFlow++
 		}
-		if event.EventType == "" || event.Timestamp.IsZero() {
+		if event.Type == "" || event.Timestamp.IsZero() {
 			t.Error("Mandatory field missing")
 		}
 
@@ -93,7 +291,7 @@ func TestLoadBrokenEveJSONFile(t *testing.T) {
 			countErrors++
 		}
 		event := loader.Event()
-		if event.EventType == "" || event.Timestamp.IsZero() {
+		if event.Type == "" || event.Timestamp.IsZero() {
 			t.Error("Mandatory field missing")
 		}
 	}
