@@ -3,7 +3,7 @@ package parsuri
 import (
 	"bufio"
 	"fmt"
-	"github.com/yunginnanet/parsuri/events"
+	"github.com/yunginnanet/parsuri/pkg/events"
 	"io"
 )
 
@@ -44,11 +44,6 @@ func (l *Loader) Scan(r io.Reader) {
 			break
 		}
 	}
-}
-
-// ParseAsync parses the input stream asynchronously.
-func (l *Loader) ParseAsync(r io.Reader) {
-	go l.Scan(r)
 }
 
 // ParseAndCloseAsync parses the input stream and closes it asynchronously.

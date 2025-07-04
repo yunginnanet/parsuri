@@ -6,7 +6,6 @@ import (
 )
 
 func TestVLANUnmarshalJSON(t *testing.T) {
-
 	t.Run("UnmarshalJSONParsesSingleVLANValueCorrectly", func(t *testing.T) {
 		input := `42`
 		var vlan VLAN
@@ -54,5 +53,4 @@ func TestVLANUnmarshalJSON(t *testing.T) {
 			t.Errorf("expected VLAN to be empty, got %v", vlan)
 		}
 	})
-
 }

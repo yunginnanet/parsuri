@@ -1,4 +1,4 @@
-package events
+package protocol
 
 type DNS struct {
 	Version int         `json:"version,omitempty"`

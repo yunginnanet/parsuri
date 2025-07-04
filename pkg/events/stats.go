@@ -1,17 +1,25 @@
 package events
 
 type Stats struct {
-	Uptime  int       `json:"uptime,omitempty"`
-	Capture Capture   `json:"capture,omitempty"`
-	Decoder Decoder   `json:"decoder,omitempty"`
-	Flow    FlowStats `json:"flow,omitempty"`
-	Defrag  Defrag    `json:"defrag,omitempty"`
-	Stream  Stream    `json:"stream,omitempty"`
-	TCP     TCPStats  `json:"tcp,omitempty"`
-	Detect  Detect    `json:"detect,omitempty"`
-	FlowMgr FlowMgr   `json:"flow_mgr,omitempty"`
-	DNS     DNSStats  `json:"dns,omitempty"`
-	HTTP    HTTPStats `json:"http,omitempty"`
+	Uptime  int        `json:"uptime,omitempty"`
+	Capture *Capture   `json:"capture,omitempty"`
+	Decoder *Decoder   `json:"decoder,omitempty"`
+	Flow    *FlowStats `json:"flow,omitempty"`
+	Defrag  *Defrag    `json:"defrag,omitempty"`
+	Stream  *Stream    `json:"stream,omitempty"`
+	TCP     *TCPStats  `json:"tcp,omitempty"`
+	Detect  *Detect    `json:"detect,omitempty"`
+	FlowMgr *FlowMgr   `json:"flow_mgr,omitempty"`
+	DNS     *DNSStats  `json:"dns,omitempty"`
+	HTTP    *HTTPStats `json:"http,omitempty"`
+}
+
+func (s Stats) Empty() bool {
+	return s.Uptime == 0 && s.Capture == nil &&
+		s.Decoder == nil && s.Flow == nil &&
+		s.Defrag == nil && s.Stream == nil &&
+		s.TCP == nil && s.Detect == nil && s.FlowMgr == nil &&
+		s.DNS == nil && s.HTTP == nil
 }
 
 type Capture struct {

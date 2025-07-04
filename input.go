@@ -24,7 +24,7 @@ func (l *Loader) LoadSTDIN() {
 }
 
 // LoadFile loads a file, parses it, and closes it asynchronously.
-// It does NOT call [Loader.Close] when finished, so [Loader.More] will return true.
+// does NOT call [Loader.Close] when finished, [Loader.More] will return true until the [Loader] is explicitly closed.
 func (l *Loader) LoadFile(path string) error {
 	file, err := os.Open(path)
 	if err != nil {

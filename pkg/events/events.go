@@ -1,5 +1,9 @@
 package events
 
+import (
+	"github.com/yunginnanet/parsuri/pkg/protocol"
+)
+
 type Alert struct {
 	Action      string `json:"action,omitempty"`
 	Gid         int    `json:"gid,omitempty"`
@@ -74,40 +78,97 @@ type PacketInfo struct {
 // EveEvent is the huge struct which can contain a parsed suricata eve.json
 // log event.
 type EveEvent struct {
-	Timestamp         *Time  `json:"timestamp"`
-	EventType         string `json:"event_type"`
-	FlowID            int64  `json:"flow_id,omitempty"`
-	InIface           string `json:"in_iface,omitempty"`
-	VLAN              VLAN   `json:"vlan,omitempty"`
-	SrcIP             string `json:"src_ip,omitempty"`
-	SrcPort           int    `json:"src_port,omitempty"`
-	DestIP            string `json:"dest_ip,omitempty"`
-	DestPort          int    `json:"dest_port,omitempty"`
-	Proto             string `json:"proto,omitempty"`
-	AppProto          string `json:"app_proto,omitempty"`
-	TxID              int    `json:"tx_id,omitempty"`
-	TCP               *TCP   `json:"tcp,omitempty"`
+	Timestamp *Time  `json:"timestamp"`
+	Type      string `json:"event_type"`
+	FlowID    int64  `json:"flow_id,omitempty"`
+	InIface   string `json:"in_iface,omitempty"`
+	VLAN      VLAN   `json:"vlan,omitempty"`
+	SrcIP     string `json:"src_ip,omitempty"`
+	SrcPort   int    `json:"src_port,omitempty"`
+	DestIP    string `json:"dest_ip,omitempty"`
+	DestPort  int    `json:"dest_port,omitempty"`
+
+	Proto    string `json:"proto,omitempty"`
+	AppProto string `json:"app_proto,omitempty"`
+
+	TxID int `json:"tx_id,omitempty"`
+
 	EtherParticipants *Ether `json:"ether,omitempty"`
 
 	PacketDetails *PacketInfo `json:"packet_info,omitempty"`
 
 	// Alert Events have some additional high level attributes to the json model
-	Alert            *Alert `json:"alert,omitempty"`
+	Alert *Alert `json:"alert,omitempty"`
+
 	Payload          string `json:"payload,omitempty"`
 	PayloadPrintable string `json:"payload_printable,omitempty"`
 	Stream           int    `json:"stream,omitempty"`
 	Packet           string `json:"packet,omitempty"`
 
-	// SMTP Events have some additional high level attributes to the json model
-	SMTP *SMTP `json:"smtp,omitempty"`
+	/*
+		Event type: Alert
+		Event type: Anomaly
+		Event type: HTTP
+		Event type: DNS
+		Event type: FTP
+		Event type: FTP_DATA
+		Event type: TLS
+		Event type: TFTP
+		Event type: KRB5
+		Event type: SMB
+		Event type: BITTORRENT-DHT
+		Event type: SSH
+		Event type: Flow
+		Event type: RDP
+		Event type: RFB
+		Event type: MQTT
+		Event type: HTTP2
+		Event type: PGSQL
+		Event type: IKE
+		Event type: Modbus
+		Event type: QUIC
+		Event type: DHCP
+		Event type: ARP
+		Event type: POP3
+	*/
 
-	// Other sub event_types
-	Email    *Email    `json:"email,omitempty"`
-	DNS      *DNS      `json:"dns,omitempty"`
-	HTTP     *HTTP     `json:"http,omitempty"`
+	TCP *TCP `json:"tcp,omitempty"`
+
+	// protocols []protocol.ProtocolDetailer
+
+	HTTP  *protocol.HTTP  `json:"http,omitempty"`
+	DNS   *protocol.DNS   `json:"dns,omitempty"`
+	DHCP  *protocol.DHCP  `json:"dhcp,omitempty"`
+	Email *protocol.Email `json:"email,omitempty"`
+	SMTP  *protocol.SMTP  `json:"smtp,omitempty"`
+	SSH   *protocol.SSH   `json:"ssh,omitempty"`
+	TLS   *protocol.TLS   `json:"tls,omitempty"`
+
 	Fileinfo *FileInfo `json:"fileinfo,omitempty"`
 	Flow     *Flow     `json:"flow,omitempty"`
-	SSH      *SSH      `json:"ssh,omitempty"`
-	TLS      *TLS      `json:"tls,omitempty"`
-	Stats    *Stats    `json:"stats,omitempty"`
+
+	Stats *Stats `json:"stats,omitempty"`
+}
+
+func (ee *EveEvent) Empty() bool {
+	if (ee.Type != "" && !ee.Timestamp.IsZero()) ||
+		(ee.SrcIP != "" || ee.SrcPort != 0 || ee.DestIP != "" || ee.DestPort != 0) ||
+		(ee.Alert != nil && !ee.Alert.Empty()) {
+		return false
+	}
+
+	if ee.Payload != "" {
+		return false
+	}
+
+	return (ee.Flow == nil || ee.Flow.Empty()) &&
+		(ee.HTTP == nil || ee.HTTP.Empty()) &&
+		(ee.DNS == nil || ee.DNS.Empty()) &&
+		(ee.DHCP == nil || ee.DHCP.Empty()) &&
+		(ee.Email == nil || ee.Email.Empty()) &&
+		(ee.Fileinfo == nil || ee.Fileinfo.Empty()) &&
+		(ee.Flow == nil || ee.Flow.Empty()) &&
+		(ee.SSH == nil || ee.SSH.Empty()) &&
+		(ee.TLS == nil || ee.TLS.Empty()) &&
+		(ee.Stats == nil || ee.Stats.Empty())
 }

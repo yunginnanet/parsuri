@@ -2,7 +2,7 @@ package events
 
 import (
 	"bytes"
-	"encoding/json"
+	json "github.com/bytedance/sonic"
 )
 
 type VLAN []int64

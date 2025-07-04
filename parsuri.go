@@ -2,8 +2,8 @@ package parsuri
 
 import (
 	sanic "github.com/bytedance/sonic"
-	"github.com/yunginnanet/parsuri/buffer"
-	"github.com/yunginnanet/parsuri/events"
+	"github.com/yunginnanet/parsuri/pkg/buffer"
+	"github.com/yunginnanet/parsuri/pkg/events"
 	"reflect"
 	"sync"
 	"sync/atomic"
